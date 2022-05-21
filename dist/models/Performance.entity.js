@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Performance = void 0;
 const typeorm_1 = require("typeorm");
+const Score_entity_1 = require("./Score.entity");
 let Performance = class Performance {
 };
 __decorate([
@@ -45,6 +46,7 @@ __decorate([
         default: () => "'[]'",
         nullable: false,
     }),
+    (0, typeorm_1.OneToMany)(() => Score_entity_1.Score, (s) => s.performanceId),
     __metadata("design:type", Array)
 ], Performance.prototype, "scores", void 0);
 Performance = __decorate([

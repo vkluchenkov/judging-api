@@ -14,12 +14,13 @@ const http = require("http");
 const WebSocket = require("ws");
 const dotenv = require("dotenv");
 const data_source_1 = require("./data-source");
-const Category_entity_1 = require("./models/Category.entity");
+const Score_entity_1 = require("./models/Score.entity");
 dotenv.config();
 const PORT = process.env.PORT || 3005;
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+// const NODE_TLS_REJECT_UNAUTHORIZED = 0;
 data_source_1.AppDataSource.initialize()
     .then(() => console.log("connection to DB established"))
     .catch((e) => console.log(e));
@@ -35,9 +36,9 @@ server.listen(PORT, () => {
     console.log(`Server started on port ${PORT} :)`);
 });
 const testCategory = () => __awaiter(void 0, void 0, void 0, function* () {
-    const categoryRepository = data_source_1.AppDataSource.getRepository(Category_entity_1.Category);
+    const ScoreRepository = data_source_1.AppDataSource.getRepository(Score_entity_1.Score);
     try {
-        const res = yield categoryRepository.find();
+        const res = yield ScoreRepository.findOneBy({ id: 1 });
         console.log(res);
     }
     catch (error) {

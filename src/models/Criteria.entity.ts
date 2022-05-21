@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Score } from "./Score.entity";
 
 @Entity({ name: "criterias" })
 export class Criteria {

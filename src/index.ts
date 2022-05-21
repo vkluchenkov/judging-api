@@ -4,6 +4,7 @@ import * as WebSocket from "ws";
 import * as dotenv from "dotenv";
 import { AppDataSource } from "./data-source";
 import { Category } from "./models/Category.entity";
+import { Score } from "./models/Score.entity";
 
 dotenv.config();
 const PORT = process.env.PORT || 3005;
@@ -11,6 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+// const NODE_TLS_REJECT_UNAUTHORIZED = 0;
 AppDataSource.initialize()
   .then(() => console.log("connection to DB established"))
   .catch((e) => console.log(e));
@@ -30,9 +32,9 @@ server.listen(PORT, () => {
 });
 
 const testCategory = async () => {
-  const categoryRepository = AppDataSource.getRepository(Category);
+  const ScoreRepository = AppDataSource.getRepository(Score);
   try {
-    const res = await categoryRepository.find();
+    const res = await ScoreRepository.findOneBy({ id: 1 });
     console.log(res);
   } catch (error) {
     console.log(error);

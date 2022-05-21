@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Score } from "./Score.entity";
 
 @Entity({ name: "performances" })
 export class Performance {
@@ -28,5 +29,6 @@ export class Performance {
     default: () => "'[]'",
     nullable: false,
   })
+  @OneToMany(() => Score, (s) => s.performanceId)
   scores: number[];
 }

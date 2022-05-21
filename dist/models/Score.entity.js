@@ -11,6 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Score = void 0;
 const typeorm_1 = require("typeorm");
+const Criteria_entity_1 = require("./Criteria.entity");
+const Judge_entity_1 = require("./Judge.entity");
+const Performance_entity_1 = require("./Performance.entity");
 let Score = class Score {
 };
 __decorate([
@@ -22,19 +25,23 @@ __decorate([
     __metadata("design:type", String)
 ], Score.prototype, "score", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: false }),
+    (0, typeorm_1.OneToOne)(() => Judge_entity_1.Judge),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", Number)
 ], Score.prototype, "judgeId", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
+    (0, typeorm_1.OneToOne)(() => Criteria_entity_1.Criteria, (c) => c.id),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", Number)
 ], Score.prototype, "criteriaId", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
+    (0, typeorm_1.ManyToOne)(() => Performance_entity_1.Performance, (p) => p.id),
     __metadata("design:type", Number)
 ], Score.prototype, "performanceId", void 0);
 Score = __decorate([
-    (0, typeorm_1.Entity)({ name: "scores" })
+    (0, typeorm_1.Entity)({ name: 'scores' })
 ], Score);
 exports.Score = Score;
 //# sourceMappingURL=Score.entity.js.map
