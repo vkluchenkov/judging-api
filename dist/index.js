@@ -13,9 +13,11 @@ const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
 const dotenv = require("dotenv");
+const bodyParser = require("body-parser");
 const data_source_1 = require("./data-source");
 const Performance_entity_1 = require("./models/Performance.entity");
-const Judge_entity_1 = require("./models/Judge.entity");
+const user_1 = require("./controllers/user");
+const handleError_1 = require("./errors/handleError");
 dotenv.config();
 const PORT = process.env.PORT || 3005;
 const app = express();
@@ -32,6 +34,12 @@ wss.on('connection', (ws) => {
     }));
     ws.send('Hi there, I am a WebSocket server');
 });
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.post('/login', user_1.login);
+app.post('/signup', user_1.signup);
+// Errors handler
+app.use((err, req, res, next) => (0, handleError_1.handleError)({ err, req, res, next }));
 server.listen(PORT, () => {
     console.log(`Server started on port ${PORT} :)`);
 });
@@ -44,16 +52,5 @@ const testQuery = () => __awaiter(void 0, void 0, void 0, function* () {
         .leftJoinAndSelect('scores.judge', 'judge')
         .leftJoinAndSelect('scores.criteria', 'criteria')
         .getMany();
-});
-const createJudge = () => __awaiter(void 0, void 0, void 0, function* () {
-    const judge = {
-        name: 'test',
-    };
-    const judgeRepository = data_source_1.AppDataSource.getRepository(Judge_entity_1.Judge);
-    return yield judgeRepository.save(judge);
-});
-const getJudges = () => __awaiter(void 0, void 0, void 0, function* () {
-    const judgeRepository = data_source_1.AppDataSource.getRepository(Judge_entity_1.Judge);
-    return yield judgeRepository.find();
 });
 //# sourceMappingURL=index.js.map

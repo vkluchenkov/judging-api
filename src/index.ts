@@ -2,9 +2,11 @@ import * as express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import * as dotenv from 'dotenv';
+import * as bodyParser from 'body-parser';
 import { AppDataSource } from './data-source';
 import { Performance } from './models/Performance.entity';
-import { Judge } from './models/Judge.entity';
+import { login, signup } from './controllers/user';
+import { handleError } from './errors/handleError';
 
 dotenv.config();
 const PORT = process.env.PORT || 3005;
@@ -25,6 +27,22 @@ wss.on('connection', (ws: WebSocket) => {
 
   ws.send('Hi there, I am a WebSocket server');
 });
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.post('/login', login);
+app.post('/signup', signup);
+
+// Errors handler
+app.use(
+  (
+    err: Error & { statusCode?: number },
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => handleError({ err, req, res, next })
+);
 
 server.listen(PORT, () => {
   console.log(`Server started on port ${PORT} :)`);
