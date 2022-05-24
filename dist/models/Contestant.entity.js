@@ -20,9 +20,9 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", String)
-], Contestant.prototype, "contestantName", void 0);
+], Contestant.prototype, "name", void 0);
 Contestant = __decorate([
-    (0, typeorm_1.Entity)({ name: "contestants" })
+    (0, typeorm_1.Entity)({ name: 'contestants' })
 ], Contestant);
 exports.Contestant = Contestant;
 //# sourceMappingURL=Contestant.entity.js.map

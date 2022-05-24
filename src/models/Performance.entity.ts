@@ -1,34 +1,33 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Score } from "./Score.entity";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Category } from './Category.entity';
+import { Contestant } from './Contestant.entity';
+import { Score } from './Score.entity';
 
-@Entity({ name: "performances" })
+@Entity({ name: 'performances' })
 export class Performance {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ nullable: false })
-  number: number;
+  startNumber: number;
 
-  @Column({ nullable: false })
-  categoryId: number;
+  @OneToOne(() => Category)
+  @JoinColumn()
+  category: Category;
 
-  @Column({ nullable: false })
-  contestantId: number;
+  @OneToOne(() => Contestant)
+  @JoinColumn()
+  contestant: Contestant;
 
-  @Column({
-    type: "jsonb",
-    array: true,
-    default: () => "'[]'",
-    nullable: false,
-  })
-  judges: number[];
-
-  @Column({
-    type: "jsonb",
-    array: true,
-    default: () => "'[]'",
-    nullable: false,
-  })
-  @OneToMany(() => Score, (s) => s.performanceId)
-  scores: number[];
+  @OneToMany(() => Score, (score) => score.performance)
+  @JoinTable()
+  scores: Score[];
 }

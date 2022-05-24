@@ -23,23 +23,21 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", String)
-], Score.prototype, "score", void 0);
+], Score.prototype, "value", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => Judge_entity_1.Judge),
+    (0, typeorm_1.OneToOne)(() => Judge_entity_1.Judge, (j) => j.id),
     (0, typeorm_1.JoinColumn)(),
-    __metadata("design:type", Number)
-], Score.prototype, "judgeId", void 0);
+    __metadata("design:type", Judge_entity_1.Judge)
+], Score.prototype, "judge", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: false }),
     (0, typeorm_1.OneToOne)(() => Criteria_entity_1.Criteria, (c) => c.id),
     (0, typeorm_1.JoinColumn)(),
-    __metadata("design:type", Number)
-], Score.prototype, "criteriaId", void 0);
+    __metadata("design:type", Criteria_entity_1.Criteria)
+], Score.prototype, "criteria", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: false }),
-    (0, typeorm_1.ManyToOne)(() => Performance_entity_1.Performance, (p) => p.id),
-    __metadata("design:type", Number)
-], Score.prototype, "performanceId", void 0);
+    (0, typeorm_1.ManyToOne)(() => Performance_entity_1.Performance, (p) => p.scores),
+    __metadata("design:type", Performance_entity_1.Performance)
+], Score.prototype, "performance", void 0);
 Score = __decorate([
     (0, typeorm_1.Entity)({ name: 'scores' })
 ], Score);

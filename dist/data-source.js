@@ -12,7 +12,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const { DB_HOST, DB_USERNAME, DB_NAME, DB_PASSWORD } = process.env;
 exports.AppDataSource = new typeorm_1.DataSource({
-    type: "postgres",
+    type: 'postgres',
     host: DB_HOST,
     port: 5432,
     username: DB_USERNAME,
@@ -26,4 +26,5 @@ exports.AppDataSource = new typeorm_1.DataSource({
         },
     },
 });
+//
 //# sourceMappingURL=data-source.js.map

@@ -18,11 +18,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Judge.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: false }),
+    (0, typeorm_1.Column)({ nullable: false, unique: true }),
     __metadata("design:type", String)
-], Judge.prototype, "judgeName", void 0);
+], Judge.prototype, "name", void 0);
 Judge = __decorate([
-    (0, typeorm_1.Entity)({ name: "judges" })
+    (0, typeorm_1.Entity)({ name: 'judges' })
 ], Judge);
 exports.Judge = Judge;
 //# sourceMappingURL=Judge.entity.js.map

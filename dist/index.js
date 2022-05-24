@@ -15,34 +15,38 @@ const WebSocket = require("ws");
 const dotenv = require("dotenv");
 const data_source_1 = require("./data-source");
 const Score_entity_1 = require("./models/Score.entity");
+const Performance_entity_1 = require("./models/Performance.entity");
 dotenv.config();
 const PORT = process.env.PORT || 3005;
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
-// const NODE_TLS_REJECT_UNAUTHORIZED = 0;
 data_source_1.AppDataSource.initialize()
-    .then(() => console.log("connection to DB established"))
+    .then(() => console.log('connection to DB established'))
     .catch((e) => console.log(e));
-wss.on("connection", (ws) => {
-    ws.on("message", (message) => {
-        console.log("received: %s", message);
-        testCategory();
-        ws.send(`Hello, you sent -> ${message}`);
-    });
-    ws.send("Hi there, I am a WebSocket server");
+wss.on('connection', (ws) => {
+    ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log('received: %s', message);
+        const res = yield testQuery();
+        ws.send(JSON.stringify(res));
+    }));
+    ws.send('Hi there, I am a WebSocket server');
 });
 server.listen(PORT, () => {
     console.log(`Server started on port ${PORT} :)`);
 });
-const testCategory = () => __awaiter(void 0, void 0, void 0, function* () {
-    const ScoreRepository = data_source_1.AppDataSource.getRepository(Score_entity_1.Score);
-    try {
-        const res = yield ScoreRepository.findOneBy({ id: 1 });
-        console.log(res);
-    }
-    catch (error) {
-        console.log(error);
-    }
+const testQuery = () => __awaiter(void 0, void 0, void 0, function* () {
+    return yield data_source_1.AppDataSource.getRepository(Performance_entity_1.Performance)
+        .createQueryBuilder('performance')
+        .leftJoinAndSelect('performance.category', 'category')
+        .leftJoinAndSelect('performance.contestant', 'contestant')
+        .leftJoinAndSelect((qb) => qb
+        .select()
+        .from(Score_entity_1.Score, 'score')
+        .leftJoinAndSelect('score.judge', 'judge')
+        .leftJoinAndSelect('score.criteria', 'criteria')
+        .groupBy('judge.id')
+        .addGroupBy('criteria.id'), 'scores', 'scores.performance = performance.id')
+        .getMany();
 });
 //# sourceMappingURL=index.js.map

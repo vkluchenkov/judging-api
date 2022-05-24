@@ -11,6 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Performance = void 0;
 const typeorm_1 = require("typeorm");
+const Category_entity_1 = require("./Category.entity");
+const Contestant_entity_1 = require("./Contestant.entity");
 const Score_entity_1 = require("./Score.entity");
 let Performance = class Performance {
 };
@@ -21,36 +23,24 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", Number)
-], Performance.prototype, "number", void 0);
+], Performance.prototype, "startNumber", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: false }),
-    __metadata("design:type", Number)
-], Performance.prototype, "categoryId", void 0);
+    (0, typeorm_1.OneToOne)(() => Category_entity_1.Category),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", Category_entity_1.Category)
+], Performance.prototype, "category", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: false }),
-    __metadata("design:type", Number)
-], Performance.prototype, "contestantId", void 0);
+    (0, typeorm_1.OneToOne)(() => Contestant_entity_1.Contestant),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", Contestant_entity_1.Contestant)
+], Performance.prototype, "contestant", void 0);
 __decorate([
-    (0, typeorm_1.Column)({
-        type: "jsonb",
-        array: true,
-        default: () => "'[]'",
-        nullable: false,
-    }),
-    __metadata("design:type", Array)
-], Performance.prototype, "judges", void 0);
-__decorate([
-    (0, typeorm_1.Column)({
-        type: "jsonb",
-        array: true,
-        default: () => "'[]'",
-        nullable: false,
-    }),
-    (0, typeorm_1.OneToMany)(() => Score_entity_1.Score, (s) => s.performanceId),
+    (0, typeorm_1.OneToMany)(() => Score_entity_1.Score, (score) => score.performance),
+    (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Array)
 ], Performance.prototype, "scores", void 0);
 Performance = __decorate([
-    (0, typeorm_1.Entity)({ name: "performances" })
+    (0, typeorm_1.Entity)({ name: 'performances' })
 ], Performance);
 exports.Performance = Performance;
 //# sourceMappingURL=Performance.entity.js.map

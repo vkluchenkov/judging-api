@@ -20,9 +20,9 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", String)
-], Criteria.prototype, "criteria", void 0);
+], Criteria.prototype, "name", void 0);
 Criteria = __decorate([
-    (0, typeorm_1.Entity)({ name: "criterias" })
+    (0, typeorm_1.Entity)({ name: 'criterias' })
 ], Criteria);
 exports.Criteria = Criteria;
 //# sourceMappingURL=Criteria.entity.js.map

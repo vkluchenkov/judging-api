@@ -20,9 +20,9 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", String)
-], Category.prototype, "categoryName", void 0);
+], Category.prototype, "name", void 0);
 Category = __decorate([
-    (0, typeorm_1.Entity)({ name: "categories" })
+    (0, typeorm_1.Entity)({ name: 'categories' })
 ], Category);
 exports.Category = Category;
 //# sourceMappingURL=Category.entity.js.map

@@ -9,19 +9,16 @@ export class Score {
   id: number;
 
   @Column({ nullable: false })
-  score: string;
+  value: string;
 
-  // @Column({ nullable: false })
-  @OneToOne(() => Judge)
+  @OneToOne(() => Judge, (j) => j.id)
   @JoinColumn()
-  judgeId: number;
+  judge: Judge;
 
-  @Column({ nullable: false })
   @OneToOne(() => Criteria, (c) => c.id)
   @JoinColumn()
-  criteriaId: number;
+  criteria: Criteria;
 
-  @Column({ nullable: false })
-  @ManyToOne(() => Performance, (p) => p.id)
-  performanceId: number;
+  @ManyToOne(() => Performance, (p) => p.scores)
+  performance: Performance;
 }
