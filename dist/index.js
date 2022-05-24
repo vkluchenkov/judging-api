@@ -14,8 +14,8 @@ const http = require("http");
 const WebSocket = require("ws");
 const dotenv = require("dotenv");
 const data_source_1 = require("./data-source");
-const Score_entity_1 = require("./models/Score.entity");
 const Performance_entity_1 = require("./models/Performance.entity");
+const Judge_entity_1 = require("./models/Judge.entity");
 dotenv.config();
 const PORT = process.env.PORT || 3005;
 const app = express();
@@ -40,13 +40,20 @@ const testQuery = () => __awaiter(void 0, void 0, void 0, function* () {
         .createQueryBuilder('performance')
         .leftJoinAndSelect('performance.category', 'category')
         .leftJoinAndSelect('performance.contestant', 'contestant')
-        .leftJoinAndSelect((qb) => qb
-        .select()
-        .from(Score_entity_1.Score, 'score')
-        .leftJoinAndSelect('score.judge', 'judge')
-        .leftJoinAndSelect('score.criteria', 'criteria')
-        .groupBy('judge.id')
-        .addGroupBy('criteria.id'), 'scores', 'scores.performance = performance.id')
+        .leftJoinAndSelect('performance.scores', 'scores')
+        .leftJoinAndSelect('scores.judge', 'judge')
+        .leftJoinAndSelect('scores.criteria', 'criteria')
         .getMany();
+});
+const createJudge = () => __awaiter(void 0, void 0, void 0, function* () {
+    const judge = {
+        name: 'test',
+    };
+    const judgeRepository = data_source_1.AppDataSource.getRepository(Judge_entity_1.Judge);
+    return yield judgeRepository.save(judge);
+});
+const getJudges = () => __awaiter(void 0, void 0, void 0, function* () {
+    const judgeRepository = data_source_1.AppDataSource.getRepository(Judge_entity_1.Judge);
+    return yield judgeRepository.find();
 });
 //# sourceMappingURL=index.js.map
