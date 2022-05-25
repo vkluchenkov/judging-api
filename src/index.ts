@@ -9,6 +9,7 @@ import { login, signup } from './controllers/user';
 import { handleError } from './errors/handleError';
 import { requestLogger } from './middlwares/logger';
 import { errorLogger } from 'express-winston';
+import { auth } from './middlwares/auth';
 
 dotenv.config();
 const PORT = process.env.PORT || 3005;
@@ -50,6 +51,8 @@ app.use(requestLogger);
 // Auth
 app.post('/login', login);
 app.post('/signup', signup);
+
+app.use(auth);
 
 // Errors logger
 app.use(errorLogger);
