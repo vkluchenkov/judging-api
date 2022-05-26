@@ -1,9 +1,6 @@
 import * as express from 'express';
-import * as WebSocket from 'ws';
 import * as dotenv from 'dotenv';
 import * as bodyParser from 'body-parser';
-import * as url from 'url';
-import * as jwt from 'jsonwebtoken';
 import { AppDataSource } from './data-source';
 import { auth } from './middlwares/auth';
 import { login, signup } from './controllers/user';
@@ -18,9 +15,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const expressServer = app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT} :)`);
-});
+const expressServer = app.listen(PORT, () => console.log(`Server started on port ${PORT} :)`));
 
 // WS server
 WebSockets(expressServer);
