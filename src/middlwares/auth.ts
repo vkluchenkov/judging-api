@@ -1,10 +1,9 @@
 import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
 import * as express from 'express';
+import { UnauthorizedError } from '../errors/UnauthorizedError';
 
 dotenv.config();
-
-const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
