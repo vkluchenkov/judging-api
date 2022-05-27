@@ -1,8 +1,6 @@
-export class UnauthorizedError extends Error {
-  public statusCode: number;
-  constructor(message: string) {
-    super(message);
-    this.name = 'UnauthorizedError';
-    this.statusCode = 401;
-  }
+import { ServerError } from './ServerError';
+
+export class UnauthorizedError extends Error implements ServerError {
+  public name = 'UnauthorizedError';
+  public statusCode = 401;
 }

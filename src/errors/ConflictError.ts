@@ -1,8 +1,6 @@
-export class ConflictError extends Error {
-  public statusCode: number;
-  constructor(message: string) {
-    super(message);
-    this.name = 'ConflictError';
-    this.statusCode = 409;
-  }
+import { ServerError } from './ServerError';
+
+export class ConflictError extends Error implements ServerError {
+  public statusCode = 409;
+  public name = 'ConflictError';
 }
