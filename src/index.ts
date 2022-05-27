@@ -4,8 +4,7 @@ import * as bodyParser from 'body-parser';
 import { AppDataSource } from './data-source';
 import { auth } from './middlwares/auth';
 import { login, signup } from './controllers/user';
-import { requestLogger } from './middlwares/logger';
-import { errorLogger } from 'express-winston';
+import { requestLogger, errorLogger } from './middlwares/logger';
 import { handleError } from './errors/handleError';
 import { WebSockets } from './websockets';
 
