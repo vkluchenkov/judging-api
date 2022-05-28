@@ -1,12 +1,12 @@
-import * as winston from 'winston';
-import * as expressWinston from 'express-winston';
+import { format, transports } from 'winston';
+import { logger, errorLogger as winstonErrorLogger } from 'express-winston';
 
-export const requestLogger = expressWinston.logger({
-  transports: [new winston.transports.File({ filename: 'request.log' })],
-  format: winston.format.json(),
+export const requestLogger = logger({
+  transports: [new transports.File({ filename: 'request.log' })],
+  format: format.json(),
 });
 
-export const errorLogger = expressWinston.errorLogger({
-  transports: [new winston.transports.File({ filename: 'error.log' })],
-  format: winston.format.json(),
+export const errorLogger = winstonErrorLogger({
+  transports: [new transports.File({ filename: 'error.log' })],
+  format: format.json(),
 });

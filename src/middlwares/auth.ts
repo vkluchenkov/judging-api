@@ -1,13 +1,13 @@
-import * as jwt from 'jsonwebtoken';
-import * as dotenv from 'dotenv';
-import * as express from 'express';
+import { verify } from 'jsonwebtoken';
+import { config } from 'dotenv';
+import { Request, Response, NextFunction } from 'express';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
 
-dotenv.config();
+config();
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-export const auth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+export const auth = (req: Request, res: Response, next: NextFunction) => {
   try {
     const { authorization } = req.headers;
     if (!authorization || !authorization.startsWith('Bearer '))
@@ -18,7 +18,7 @@ export const auth = (req: express.Request, res: express.Response, next: express.
 
     if (!token) throw new UnauthorizedError('Incorrect or missing token');
 
-    const payload = jwt.verify(token, secret);
+    const payload = verify(token, secret);
 
     if (!payload) throw new UnauthorizedError('Incorrect or missing token');
 
