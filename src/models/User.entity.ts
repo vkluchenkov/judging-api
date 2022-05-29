@@ -9,7 +9,7 @@ export class User {
   @Column({ nullable: false, unique: true })
   username: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, select: false })
   password: string;
 
   @OneToOne(() => Judge)
