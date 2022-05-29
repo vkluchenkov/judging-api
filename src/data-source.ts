@@ -5,8 +5,9 @@ import { Criteria } from './models/Criteria.entity';
 import { Judge } from './models/Judge.entity';
 import { Performance } from './models/Performance.entity';
 import { Score } from './models/Score.entity';
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { config } from 'dotenv';
+import { User } from './models/User.entity';
+config();
 
 const { DB_HOST, DB_USERNAME, DB_NAME, DB_PASSWORD } = process.env;
 
@@ -17,7 +18,7 @@ export const AppDataSource = new DataSource({
   username: DB_USERNAME,
   password: DB_PASSWORD,
   database: DB_NAME,
-  entities: [Category, Contestant, Criteria, Judge, Performance, Score],
+  entities: [Category, Contestant, Criteria, Judge, Performance, Score, User],
   synchronize: false,
   extra: {
     ssl: {
