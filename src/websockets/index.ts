@@ -18,7 +18,7 @@ export const WebSockets = (expressServer: httpServer) => {
     } else {
       const token = parse(req.url, true).query.token as string;
       const { NODE_ENV, JWT_SECRET } = process.env;
-      const secret = NODE_ENV === 'production' ? JWT_SECRET! : 'dev-secret';
+      const secret = NODE_ENV === 'production' && JWT_SECRET ? JWT_SECRET : 'dev-secret';
       const payload = verify(token, secret) as JwtPayload;
 
       if (!payload) {
@@ -40,6 +40,8 @@ export const WebSockets = (expressServer: httpServer) => {
           });
         }
       });
+
+      ws.on('close', () => delete wsClients[token]);
     }
   });
 };
