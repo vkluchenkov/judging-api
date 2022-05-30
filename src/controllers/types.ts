@@ -4,6 +4,7 @@ export interface LoginPayload {
 }
 
 export interface JudgeMessage {
-  type: 'getScores' | 'saveScores' | 'confirmCategory' | 'callHelp';
+  type: 'getScores' | 'saveScores' | 'confirmCategory' | 'callHelp' | 'getCategory';
   performanceId?: number;
+  categoryId?: number;
 }

@@ -48,3 +48,11 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
     next(err);
   }
 };
+
+export const getUser = async (id: number) => {
+  return await AppDataSource.getRepository(User)
+    .createQueryBuilder('user')
+    .where('user.id = :id', { id })
+    .leftJoinAndSelect('user.judge', 'judge')
+    .getOne();
+};

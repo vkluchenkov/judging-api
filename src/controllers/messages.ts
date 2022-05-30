@@ -13,6 +13,15 @@ export const parser = async (client: WebSocket, user: User, message: JudgeMessag
     };
     client.send(JSON.stringify(dto));
   }
+
+  if (message.type === 'getCategory' && message.categoryId) {
+    const res = await getCategoryByJudge(user, message.categoryId!);
+    const dto = {
+      view: 'category',
+      data: res,
+    };
+    client.send(JSON.stringify(dto));
+  }
 };
 
 const getScoresByJudge = async (user: User, performanceId: number) => {
@@ -26,4 +35,17 @@ const getScoresByJudge = async (user: User, performanceId: number) => {
     .andWhere('scoreJudge.id = :judge', { judge: user.judge.id })
     .leftJoinAndSelect('scores.criteria', 'criteria')
     .getOne();
+};
+
+const getCategoryByJudge = async (user: User, categoryId: number) => {
+  return await AppDataSource.getRepository(Performance)
+    .createQueryBuilder('performance')
+    .leftJoinAndSelect('performance.category', 'category')
+    .where('category.id = :id', { id: categoryId })
+    .leftJoinAndSelect('performance.contestant', 'contestant')
+    .leftJoinAndSelect('performance.scores', 'scores')
+    .leftJoinAndSelect('scores.judge', 'scoreJudge')
+    .andWhere('scoreJudge.id = :judge', { judge: user.judge.id })
+    .leftJoinAndSelect('scores.criteria', 'criteria')
+    .getMany();
 };

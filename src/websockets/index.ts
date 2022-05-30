@@ -3,8 +3,7 @@ import { parse } from 'url';
 import { Server, WebSocket } from 'ws';
 import { Server as httpServer } from 'http';
 import { parser } from '../controllers/messages';
-import { AppDataSource } from '../data-source';
-import { User } from '../models/User.entity';
+import { getUser } from '../controllers/user';
 
 type WsClients = {
   [key: string]: WebSocket;
@@ -18,32 +17,37 @@ export const WebSockets = (expressServer: httpServer) => {
     if (!req.url) {
       ws.send('Error: Incorrect or missing token');
       ws.close();
-    } else {
-      const token = parse(req.url, true).query.token as string;
-      if (!token) {
+      return;
+    }
+
+    const token = parse(req.url, true).query.token as string;
+    if (!token) {
+      ws.send('Error: Incorrect or missing token');
+      ws.close();
+      return;
+    }
+    const { NODE_ENV, JWT_SECRET } = process.env;
+    const secret = NODE_ENV === 'production' && JWT_SECRET ? JWT_SECRET : 'dev-secret';
+
+    const payload = () => {
+      try {
+        return verify(token, secret) as JwtPayload;
+      } catch (err) {
         ws.send('Error: Incorrect or missing token');
         ws.close();
-        return;
       }
-      const { NODE_ENV, JWT_SECRET } = process.env;
-      const secret = NODE_ENV === 'production' && JWT_SECRET ? JWT_SECRET : 'dev-secret';
-      const payload = verify(token, secret) as JwtPayload;
+    };
 
-      if (!payload) {
-        ws.send('Error: Incorrect or missing token');
-        ws.close();
-        return;
-      }
-
+    if (payload()) {
       wsClients[token] = ws;
-      ws.send('Hi there, I am a WebSocket server!');
-      const userId = payload.id as unknown as number;
+      const user = await getUser(payload()!.id);
+      if (!user) {
+        ws.send('Error: No user found');
+        ws.close();
+        return;
+      }
 
-      const user = await AppDataSource.getRepository(User)
-        .createQueryBuilder('user')
-        .where('user.id = :id', { id: userId })
-        .leftJoinAndSelect('user.judge', 'judge')
-        .getOne();
+      ws.send('Hi there, I am a WebSocket server!');
 
       ws.on('message', (data) => {
         for (const [token, client] of Object.entries(wsClients)) {
@@ -55,8 +59,7 @@ export const WebSockets = (expressServer: httpServer) => {
           });
         }
       });
-
-      ws.on('close', () => delete wsClients[token]);
     }
+    ws.on('close', () => delete wsClients[token]);
   });
 };
