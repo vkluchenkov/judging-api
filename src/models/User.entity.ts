@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Judge } from './Judge.entity';
+import { Role } from './Role.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -9,10 +10,14 @@ export class User {
   @Column({ nullable: false, unique: true })
   username: string;
 
-  @Column({ nullable: false, select: false })
+  @Column({ nullable: false })
   password: string;
 
   @OneToOne(() => Judge)
   @JoinColumn()
   judge: Judge;
+
+  @OneToOne(() => Role)
+  @JoinColumn()
+  role: Role;
 }

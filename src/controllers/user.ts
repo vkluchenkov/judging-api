@@ -28,6 +28,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       }
     }
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
@@ -54,5 +55,6 @@ export const getUser = async (id: number) => {
     .createQueryBuilder('user')
     .where('user.id = :id', { id })
     .leftJoinAndSelect('user.judge', 'judge')
+    .leftJoinAndSelect('user.role', 'role')
     .getOne();
 };
