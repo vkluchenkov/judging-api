@@ -33,7 +33,7 @@ export const parser = async (
 
   // Judge messages
   if (user.role.name === 'judge') {
-    // Get performance for re-scoring by individual judge
+    // Get single performance for re-scoring by individual judge
     if (message.type === 'getScores' && message.performanceId) {
       if (user.judge) {
         const res = await getScoresByJudge(user.judge.id, message.performanceId!);

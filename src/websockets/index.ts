@@ -5,6 +5,9 @@ import { Server as httpServer } from 'http';
 import { parser } from '../controllers/messages';
 import { getUser } from '../controllers/user';
 import { WsClient } from './types';
+import { config } from 'dotenv';
+
+config();
 
 export const WebSockets = (expressServer: httpServer) => {
   const wsClients: WsClient[] = [];
