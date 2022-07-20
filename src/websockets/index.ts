@@ -61,17 +61,17 @@ export const WebSockets = (expressServer: httpServer) => {
       ws.send(`Hi ${user.username}, I am a WebSocket server!`);
 
       // Check token on each message and send to parser if valid
-      ws.on('message', (data) => {
+      ws.on('message', async (data) => {
         wsClients.forEach((c) => console.log(c.user.username)); // test
         const client = wsClients.find((el) => el.socket === ws);
         if (client) {
           try {
             const isValid = verify(token, secret);
-            if (isValid) parser(client, user!, JSON.parse(data.toString()), wsClients);
+            if (isValid) await parser(client, user!, JSON.parse(data.toString()), wsClients);
           } catch (err) {
             client.socket.send('Error: Your token is no longer valid. Please reauthenticate.');
             client.socket.close();
-            console.log(err);
+            console.log('e3');
           }
         }
       });

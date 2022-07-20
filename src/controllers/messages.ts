@@ -1,4 +1,3 @@
-import { createQueryBuilder } from 'typeorm';
 import { AppDataSource } from '../data-source';
 import { Note } from '../models/Note.entity';
 import { Performance } from '../models/Performance.entity';
@@ -64,16 +63,14 @@ export const parser = async (
 
     // Save scores by Judge
     if (message.type === 'saveScores') {
-      saveScoresByJudge({
-        scores: [
-          { criteriaId: 1, score: 1 },
-          { criteriaId: 2, score: 1 },
-          // { criteriaId: 4, score: 1 },
-        ],
-        note: '123',
-        performanceId: 1,
-        judgeId: 2,
-      });
+      const { performanceId, scores, note } = message;
+      const { id: judgeId } = user.judge;
+      try {
+        const dto = await saveScoresByJudge({ scores, note, performanceId, judgeId });
+        client.socket.send(JSON.stringify(dto));
+      } catch (e) {
+        console.log('e2');
+      }
     }
   }
 };
@@ -124,8 +121,16 @@ const saveScoresByJudge = async (payload: SaveScoresPayload) => {
       performance: { id: performanceId },
     };
 
-    if (!isScore) await scoresRepository.save(scoreRes);
-    else await scoresRepository.update({ id: isScore.id }, { value: score.score });
+    if (!isScore) {
+      return new Promise((resolve, reject) => {
+        return scoresRepository.save(scoreRes).catch(reject);
+      });
+      // try {
+      //   await scoresRepository.save(scoreRes);
+      // } catch (e) {
+      //   console.log('e1');
+      // }
+    } else return scoresRepository.update({ id: isScore.id }, { value: score.score });
   });
 
   // Note saving
@@ -134,12 +139,14 @@ const saveScoresByJudge = async (payload: SaveScoresPayload) => {
     performance: { id: performanceId },
   });
 
-  const noteRes = {
+  const noteDBPayload = {
     text: note,
     judge: { id: judgeId },
     performance: { id: performanceId },
   };
 
-  if (!isNote && note.length) await notesRepository.save(noteRes);
+  if (!isNote && note.length) await notesRepository.save(noteDBPayload);
   else if (note.length) await notesRepository.update({ id: isNote!.id }, { text: note });
+
+  return await getScoresByJudge(judgeId, performanceId);
 };
