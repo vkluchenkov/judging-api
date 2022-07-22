@@ -85,6 +85,9 @@ const getScoresByJudge = async (judgeId: number, performanceId: number) => {
     .leftJoinAndSelect('scores.judge', 'scoreJudge')
     .andWhere('scoreJudge.id = :judge', { judge: judgeId })
     .leftJoinAndSelect('scores.criteria', 'criteria')
+    .leftJoinAndSelect('performance.notes', 'notes')
+    .leftJoinAndSelect('notes.judge', 'noteJudge')
+    .andWhere('noteJudge.id = :judge', { judge: judgeId })
     .getOne();
 };
 
@@ -98,6 +101,9 @@ const getCategoryByJudge = async (user: User, categoryId: number) => {
     .leftJoinAndSelect('scores.judge', 'scoreJudge')
     .andWhere('scoreJudge.id = :judge', { judge: user.judge.id })
     .leftJoinAndSelect('scores.criteria', 'criteria')
+    .leftJoinAndSelect('performance.notes', 'notes')
+    .leftJoinAndSelect('notes.judge', 'noteJudge')
+    .andWhere('noteJudge.id = :judge', { judge: user.judge.id })
     .getMany();
 };
 
