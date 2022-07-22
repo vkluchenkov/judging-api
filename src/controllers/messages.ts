@@ -65,12 +65,45 @@ export const parser = async (
     if (message.type === 'saveScores') {
       const { performanceId, scores, note } = message;
       const { id: judgeId } = user.judge;
-      try {
-        const dto = await saveScoresByJudge({ scores, note, performanceId, judgeId });
+      const performance = await getScoresByJudge(judgeId, performanceId);
+
+      if (performance?.category.isClosed) {
+        const dto = {
+          view: 'message',
+          data: {
+            message: "You can't save scores to this category, because it's closed.",
+          },
+        };
         client.socket.send(JSON.stringify(dto));
-      } catch (e) {
-        console.log('e2');
+      } else {
+        const res = await saveScoresByJudge({ scores, note, performanceId, judgeId });
+        //if category is finished (no dancer on stage), return category view
+        if (res && res.category.isFinished) {
+          const categoryData = await getCategoryByJudge(user, res.category.id);
+          const dto = {
+            view: 'category',
+            data: categoryData,
+          };
+          client.socket.send(JSON.stringify(dto));
+          //else return message to avait for the next
+        } else {
+          const dto = {
+            view: 'message',
+            data: { message: 'Thank you! Please wait for updates.' },
+          };
+          client.socket.send(JSON.stringify(dto));
+        }
       }
+    }
+
+    if (message.type === 'callHelp') {
+      // send message to admin here
+
+      const dto = {
+        view: 'notification',
+        data: { message: 'Admin help requested. Please wait.' },
+      };
+      client.socket.send(JSON.stringify(dto));
     }
   }
 };
