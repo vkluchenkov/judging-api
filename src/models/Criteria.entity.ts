@@ -7,4 +7,7 @@ export class Criteria {
 
   @Column({ nullable: false })
   name: string;
+
+  @Column({ nullable: false })
+  description: string;
 }

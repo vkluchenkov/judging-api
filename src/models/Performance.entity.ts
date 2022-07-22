@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Category } from './Category.entity';
 import { Contestant } from './Contestant.entity';
+import { Note } from './Note.entity';
 import { Score } from './Score.entity';
 
 @Entity({ name: 'performances' })
@@ -30,4 +31,8 @@ export class Performance {
   @OneToMany(() => Score, (score) => score.performance)
   @JoinTable()
   scores: Score[];
+
+  @OneToMany(() => Note, (note) => note.performance)
+  @JoinTable()
+  notes: Note[];
 }

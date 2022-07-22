@@ -7,4 +7,10 @@ export class Category {
 
   @Column({ nullable: false })
   name: string;
+
+  @Column({ nullable: false })
+  isClosed: boolean;
+
+  @Column({ nullable: false })
+  isFinished: boolean;
 }
