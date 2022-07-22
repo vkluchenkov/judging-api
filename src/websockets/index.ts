@@ -69,7 +69,7 @@ export const WebSockets = (expressServer: httpServer) => {
             const isValid = verify(token, secret);
             if (isValid) await parser(client, user!, JSON.parse(data.toString()), wsClients);
           } catch (err) {
-            client.socket.send('Error: Your token is no longer valid. Please reauthenticate.');
+            client.socket.send('Error: Your token is no longer valid. Please reauthenticate.'); //поправить логику месседжей с учетом ошибок парсера
             client.socket.close();
             console.log('e3');
           }
