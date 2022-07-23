@@ -4,7 +4,7 @@ import { Performance } from '../models/Performance.entity';
 import { Score } from '../models/Score.entity';
 import { User } from '../models/User.entity';
 import { WsClient } from '../websockets/types';
-import { Message, SaveScoresPayload } from './types';
+import { categoryDto, helpDto, Message, messageDto, SaveScoresPayload, scoresDto } from './types';
 
 export const parser = async (
   client: WsClient,
@@ -24,12 +24,16 @@ export const parser = async (
       judgeSessions.forEach(async (js) => {
         if (js.user.judge) {
           const res = await getScoresByJudge(js.user.judge.id, message.performanceId!);
-          const dto = {
-            view: 'scoring',
-            data: res,
-          };
-          js.socket.send(JSON.stringify(dto));
-          client.socket.send(`Performance ${message.performanceId} sent to ${js.user.judge.name}`);
+          if (res) {
+            const dto: scoresDto = {
+              view: 'scoring',
+              data: res,
+            };
+            js.socket.send(JSON.stringify(dto));
+            client.socket.send(
+              `Performance ${message.performanceId} sent to ${js.user.judge.name}`
+            );
+          }
         }
       });
     }
@@ -43,22 +47,26 @@ export const parser = async (
     if (message.type === 'getScores' && message.performanceId) {
       if (user.judge) {
         const res = await getScoresByJudge(user.judge.id, message.performanceId!);
-        const dto = {
-          view: 'scoring',
-          data: res,
-        };
-        client.socket.send(JSON.stringify(dto));
+        if (res) {
+          const dto: scoresDto = {
+            view: 'scoring',
+            data: res,
+          };
+          client.socket.send(JSON.stringify(dto));
+        }
       }
     }
 
     // Get category for approval or changes by individual judge
     if (message.type === 'getCategory' && message.categoryId) {
       const res = await getCategoryByJudge(user, message.categoryId!);
-      const dto = {
-        view: 'category',
-        data: res,
-      };
-      client.socket.send(JSON.stringify(dto));
+      if (res) {
+        const dto: categoryDto = {
+          view: 'category',
+          data: res,
+        };
+        client.socket.send(JSON.stringify(dto));
+      }
     }
 
     // Save scores by Judge
@@ -68,7 +76,7 @@ export const parser = async (
       const performance = await getScoresByJudge(judgeId, performanceId);
 
       if (performance?.category.isClosed) {
-        const dto = {
+        const dto: messageDto = {
           view: 'message',
           data: {
             message: "You can't save scores to this category, because it's closed.",
@@ -80,14 +88,14 @@ export const parser = async (
         //if category is finished (no dancer on stage), return category view
         if (res && res.category.isFinished) {
           const categoryData = await getCategoryByJudge(user, res.category.id);
-          const dto = {
+          const dto: categoryDto = {
             view: 'category',
             data: categoryData,
           };
           client.socket.send(JSON.stringify(dto));
           //else return message to avait for the next
         } else {
-          const dto = {
+          const dto: messageDto = {
             view: 'message',
             data: { message: 'Thank you! Please wait for updates.' },
           };
@@ -99,9 +107,9 @@ export const parser = async (
     if (message.type === 'callHelp') {
       // send message to admin here
 
-      const dto = {
-        view: 'notification',
-        data: { message: 'Admin help requested. Please wait.' },
+      const dto: helpDto = {
+        view: 'helpRequest',
+        data: { isSuccess: true },
       };
       client.socket.send(JSON.stringify(dto));
     }
