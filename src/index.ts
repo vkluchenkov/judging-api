@@ -22,22 +22,22 @@ WebSockets(expressServer);
 
 // Database
 AppDataSource.initialize()
-  .then(() => console.log('connection to DB established'))
+  .then(() => console.log('DB connection established'))
   .catch((err) => console.log(err));
 
-// Request logger
+// REST Request logger
 app.use(requestLogger);
 
-// Auth
+// REST Auth
 app.post('/login', login);
 app.post('/signup', signup);
 
 app.use(auth);
 
-// Errors logger
+// REST Errors logger
 app.use(errorLogger);
 
-// Errors handler
+// REST Errors handler
 app.use(
   (err: ServerError, req: express.Request, res: express.Response, next: express.NextFunction) =>
     handleError({ err, req, res, next })

@@ -63,7 +63,7 @@ const getScoresHandler = async (payload: GetScoresPayload) => {
 const getCategoryHandler = async (payload: GetCategoryPayload) => {
   const { user, message, client } = payload;
   const res = await getCategoryByJudge(user, message.categoryId);
-  if (!res)
+  if (!res.length)
     throw new NotFoundError(
       `No category found for the judge ${user.judge.name} and category with id ${message.categoryId}`
     );
@@ -137,7 +137,7 @@ const confirmCategoryHandler = async (payload: ConfirmCategoryPayload) => {
 
 // Parser
 export const parser = async (payload: ParserPayload) => {
-  const { client, user, message } = payload;
+  const { user, message } = payload;
 
   // Admin messages
   if (user.role.name === 'admin') {

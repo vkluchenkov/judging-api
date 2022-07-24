@@ -62,7 +62,6 @@ export const WebSockets = (expressServer: httpServer) => {
 
       // Check token on each message and send to parser if valid
       ws.on('message', async (data) => {
-        // wsClients.forEach((c) => console.log(c.user.username));
         const client = wsClients.find((el) => el.socket === ws);
         if (client) {
           try {
