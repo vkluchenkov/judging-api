@@ -62,12 +62,13 @@ export const WebSockets = (expressServer: httpServer) => {
 
       // Check token on each message and send to parser if valid
       ws.on('message', async (data) => {
-        wsClients.forEach((c) => console.log(c.user.username)); // test
+        // wsClients.forEach((c) => console.log(c.user.username));
         const client = wsClients.find((el) => el.socket === ws);
         if (client) {
           try {
             const isValid = verify(token, secret);
-            if (isValid) await parser(client, user!, JSON.parse(data.toString()), wsClients);
+            if (isValid)
+              await parser({ client, user, message: JSON.parse(data.toString()), wsClients });
           } catch (err) {
             client.socket.send('Error: Your token is no longer valid. Please reauthenticate.'); //поправить логику месседжей с учетом ошибок парсера
             client.socket.close();

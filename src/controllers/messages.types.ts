@@ -1,11 +1,8 @@
 import { Performance } from '../models/Performance.entity';
+import { User } from '../models/User.entity';
+import { WsClient } from '../websockets/types';
 
 // Payloads
-export interface LoginPayload {
-  username: string;
-  password: string;
-}
-
 interface Score {
   criteriaId: number;
   score: number;
@@ -16,6 +13,20 @@ export interface SaveScoresPayload {
   note: string;
   performanceId: number;
   judgeId: number;
+}
+
+export interface ParserPayload {
+  client: WsClient;
+  user: User;
+  message: Message;
+  wsClients: WsClient[];
+}
+
+export interface PushScoresPayload {
+  client: WsClient;
+  user: User;
+  message: PushScoresMessage;
+  wsClients: WsClient[];
 }
 
 // Incoming messages from judges
@@ -73,28 +84,3 @@ export type Message =
   | PushScoresMessage
   | PushCategoryMessage
   | ChangeCategoryStatusMessage;
-
-// Outgoing messages to judges
-export interface scoresDto {
-  view: 'scoring';
-  data: Performance;
-}
-
-export interface categoryDto {
-  view: 'category';
-  data: Performance[];
-}
-
-export interface messageDto {
-  view: 'message';
-  data: {
-    message: string;
-  };
-}
-
-export interface helpDto {
-  view: 'helpRequest';
-  data: {
-    isSuccess: boolean;
-  };
-}

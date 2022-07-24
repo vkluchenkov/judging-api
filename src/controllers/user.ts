@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { config } from 'dotenv';
 import { sign } from 'jsonwebtoken';
 import { compare, hash } from 'bcryptjs';
-import { LoginPayload } from './types';
+import { LoginPayload } from './user.types';
 import { User } from '../models/User.entity';
 import { AppDataSource } from '../data-source';
 import { UnauthorizedError } from '../errors/UnauthorizedError';

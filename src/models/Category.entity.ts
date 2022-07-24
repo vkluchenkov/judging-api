@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Judge } from './Judge.entity';
 
 @Entity({ name: 'categories' })
 export class Category {
@@ -13,4 +14,8 @@ export class Category {
 
   @Column({ nullable: false })
   isFinished: boolean;
+
+  @ManyToMany(() => Judge, (judge) => judge.approvedCategories)
+  @JoinTable()
+  approvedBy: Judge[];
 }
