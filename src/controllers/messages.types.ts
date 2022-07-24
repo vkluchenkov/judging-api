@@ -8,7 +8,7 @@ interface Score {
   score: number;
 }
 
-export interface SaveScoresPayload {
+export interface SaveScoresServicePayload {
   scores: Score[];
   note: string;
   performanceId: number;
@@ -26,6 +26,41 @@ export interface PushScoresPayload {
   client: WsClient;
   user: User;
   message: PushScoresMessage;
+  wsClients: WsClient[];
+}
+
+export interface GetScoresPayload {
+  client: WsClient;
+  user: User;
+  message: GetScoresMessage;
+  wsClients: WsClient[];
+}
+
+export interface GetCategoryPayload {
+  client: WsClient;
+  user: User;
+  message: GetCategoryMessage;
+  wsClients: WsClient[];
+}
+
+export interface SaveScoresPayload {
+  client: WsClient;
+  user: User;
+  message: SaveScoresMessage;
+  wsClients: WsClient[];
+}
+
+export interface CallHelpPayload {
+  client: WsClient;
+  user: User;
+  message: CallHelpMessage;
+  wsClients: WsClient[];
+}
+
+export interface ConfirmCategoryPayload {
+  client: WsClient;
+  user: User;
+  message: ConfirmCategoryMessage;
   wsClients: WsClient[];
 }
 

@@ -5,7 +5,10 @@ import { Note } from '../models/Note.entity';
 import { Performance } from '../models/Performance.entity';
 import { Score } from '../models/Score.entity';
 import { User } from '../models/User.entity';
-import { SaveScoresPayload } from '../controllers/messages.types';
+import { SaveScoresServicePayload } from '../controllers/messages.types';
+import { handleWsError } from '../errors/handleWsError';
+import { ServerError } from '../errors/ServerError';
+import { NotFoundError } from '../errors/NotFoundError';
 
 export const getScoresByJudge = async (judgeId: number, performanceId: number) => {
   return await AppDataSource.getRepository(Performance)
@@ -39,32 +42,36 @@ export const getCategoryByJudge = async (user: User, categoryId: number) => {
     .getMany();
 };
 
-export const saveScoresByJudge = async (payload: SaveScoresPayload) => {
+export const saveScoresByJudge = async (payload: SaveScoresServicePayload) => {
   const { scores, note, performanceId, judgeId } = payload;
   const scoresRepository = await AppDataSource.getRepository(Score);
   const notesRepository = await AppDataSource.getRepository(Note);
 
   // Scores saving
-  await Promise.all(
-    scores.map(async (score) => {
-      const isScore = await scoresRepository.findOneBy({
-        judge: { id: judgeId },
-        criteria: { id: score.criteriaId },
-        performance: { id: performanceId },
-      });
+  try {
+    await Promise.all(
+      scores.map(async (score) => {
+        const isScore = await scoresRepository.findOneBy({
+          judge: { id: judgeId },
+          criteria: { id: score.criteriaId },
+          performance: { id: performanceId },
+        });
 
-      const scoreRes = {
-        value: score.score,
-        judge: { id: judgeId },
-        criteria: { id: score.criteriaId },
-        performance: { id: performanceId },
-      };
+        const scoreRes = {
+          value: score.score,
+          judge: { id: judgeId },
+          criteria: { id: score.criteriaId },
+          performance: { id: performanceId },
+        };
 
-      if (!isScore) {
-        return scoresRepository.save(scoreRes);
-      } else return scoresRepository.update({ id: isScore.id }, { value: score.score });
-    })
-  );
+        if (!isScore) {
+          return scoresRepository.save(scoreRes);
+        } else return scoresRepository.update({ id: isScore.id }, { value: score.score });
+      })
+    );
+  } catch (error) {
+    handleWsError({ err: error as ServerError });
+  }
 
   // Note saving
   const isNote = await notesRepository.findOneBy({
@@ -78,8 +85,12 @@ export const saveScoresByJudge = async (payload: SaveScoresPayload) => {
     performance: { id: performanceId },
   };
 
-  if (!isNote && note.length) await notesRepository.save(noteDBPayload);
-  else if (note.length) await notesRepository.update({ id: isNote!.id }, { text: note });
+  try {
+    if (!isNote && note.length) await notesRepository.save(noteDBPayload);
+    else await notesRepository.update({ id: isNote!.id }, { text: note });
+  } catch (error) {
+    handleWsError({ err: error as ServerError });
+  }
 
   return await getScoresByJudge(judgeId, performanceId);
 };
@@ -89,15 +100,18 @@ export const confirmCategory = async (judgeId: number, categoryId: number) => {
   const judgeRepository = AppDataSource.getRepository(Judge);
 
   const judge = await judgeRepository.findOneBy({ id: judgeId });
-  const category = await categoryRepository.findOneBy({ id: categoryId });
+  if (!judge) throw new NotFoundError(`No judge found with id ${judgeId}`);
 
-  if (category) {
-    const isApproved = category.approvedBy.filter((judge) => judge.id === judgeId);
-    if (!isApproved.length) {
-      category.approvedBy.push(judge!);
-      try {
-        await categoryRepository.save(category);
-      } catch (error) {}
+  const category = await categoryRepository.findOneBy({ id: categoryId });
+  if (!category) throw new NotFoundError(`No category found with id ${categoryId}`);
+
+  const isApproved = category.approvedBy.filter((judge) => judge.id === judgeId);
+  if (!isApproved.length) {
+    category.approvedBy.push(judge!);
+    try {
+      await categoryRepository.save(category);
+    } catch (error) {
+      handleWsError({ err: error as ServerError });
     }
   }
 };
