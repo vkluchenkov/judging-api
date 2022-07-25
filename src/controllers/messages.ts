@@ -11,7 +11,7 @@ import {
   PushScoresPayload,
   SaveScoresPayload,
 } from './messages.types';
-import { categoryDto, helpDto, judgeMessageDto, scoresDto } from './messages.dto';
+import { categoryDto, notificationDto, judgeMessageDto, scoresDto } from './messages.dto';
 import {
   getScoresByJudge,
   getCategoryByJudge,
@@ -81,12 +81,8 @@ const saveScoresHandler = async (payload: SaveScoresPayload) => {
   const { id: judgeId } = user.judge;
 
   const performance = await getScoresByJudge(judgeId, performanceId);
-  if (!performance)
-    throw new NotFoundError(
-      `No scores found for the judge ${user.judge.name} and the performance with id ${message.performanceId}`
-    );
 
-  if (performance.category.isClosed)
+  if (performance && performance.category.isClosed)
     throw new ConflictError(
       `Not possible to save scores in closed category ${performance.category.name}`
     );
@@ -117,8 +113,8 @@ const callHelpHandler = async (payload: CallHelpPayload) => {
   const { client } = payload;
   // Here goes nothing (message to admin logic)
 
-  const dto: helpDto = {
-    view: 'helpRequest',
+  const dto: notificationDto = {
+    view: 'notification',
     data: { isSuccess: true },
   };
   client.socket.send(JSON.stringify(dto));
@@ -128,8 +124,8 @@ const confirmCategoryHandler = async (payload: ConfirmCategoryPayload) => {
   const { client, user, message } = payload;
   await confirmCategory(user.judge.id, message.categoryId);
 
-  const dto: helpDto = {
-    view: 'helpRequest',
+  const dto: notificationDto = {
+    view: 'notification',
     data: { isSuccess: true },
   };
   client.socket.send(JSON.stringify(dto));
@@ -197,6 +193,7 @@ export const parser = async (payload: ParserPayload) => {
       try {
         await confirmCategoryHandler(payload as ConfirmCategoryPayload);
       } catch (error) {
+        console.log(error);
         handleWsError({ err: error as ServerError });
       }
     }

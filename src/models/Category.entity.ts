@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Judge } from './Judge.entity';
 
 @Entity({ name: 'categories' })
@@ -9,13 +9,13 @@ export class Category {
   @Column({ nullable: false })
   name: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, default: false })
   isClosed: boolean;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, default: false })
   isFinished: boolean;
 
-  @ManyToMany(() => Judge, (judge) => judge.approvedCategories)
+  @ManyToMany(() => Judge, (judge) => judge.id)
   @JoinTable()
   approvedBy: Judge[];
 }

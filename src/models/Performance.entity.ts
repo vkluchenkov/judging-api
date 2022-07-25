@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   JoinTable,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -24,8 +25,7 @@ export class Performance {
   @JoinColumn()
   category: Category;
 
-  @OneToOne(() => Contestant)
-  @JoinColumn()
+  @ManyToOne(() => Contestant)
   contestant: Contestant;
 
   @OneToMany(() => Score, (score) => score.performance)

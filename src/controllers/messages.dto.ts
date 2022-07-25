@@ -17,8 +17,8 @@ export interface judgeMessageDto {
   };
 }
 
-export interface helpDto {
-  view: 'helpRequest';
+export interface notificationDto {
+  view: 'notification';
   data: {
     isSuccess: boolean;
   };

@@ -22,7 +22,7 @@ export const AppDataSource = new DataSource({
   password: DB_PASSWORD,
   database: DB_NAME,
   entities: [Category, Contestant, Criteria, Judge, Performance, Score, User, Role, Note],
-  synchronize: false,
+  synchronize: true,
   extra: {
     ssl: {
       rejectUnauthorized: false,

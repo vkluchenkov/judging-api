@@ -9,6 +9,7 @@ import { SaveScoresServicePayload } from '../controllers/messages.types';
 import { handleWsError } from '../errors/handleWsError';
 import { ServerError } from '../errors/ServerError';
 import { NotFoundError } from '../errors/NotFoundError';
+import { JoinTable } from 'typeorm';
 
 export const getScoresByJudge = async (judgeId: number, performanceId: number) => {
   return await AppDataSource.getRepository(Performance)
@@ -102,9 +103,13 @@ export const confirmCategory = async (judgeId: number, categoryId: number) => {
   const judge = await judgeRepository.findOneBy({ id: judgeId });
   if (!judge) throw new NotFoundError(`No judge found with id ${judgeId}`);
 
-  const category = await categoryRepository.findOneBy({ id: categoryId });
+  const category = await categoryRepository.findOne({
+    where: { id: categoryId },
+    relations: { approvedBy: true },
+  });
   if (!category) throw new NotFoundError(`No category found with id ${categoryId}`);
 
+  console.log(category);
   const isApproved = category.approvedBy.filter((judge) => judge.id === judgeId);
   if (!isApproved.length) {
     category.approvedBy.push(judge!);

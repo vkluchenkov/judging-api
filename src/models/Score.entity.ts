@@ -11,11 +11,11 @@ export class Score {
   @Column({ nullable: false })
   value: number;
 
-  @OneToOne(() => Judge, (j) => j.id)
+  @ManyToOne(() => Judge, (j) => j.id)
   @JoinColumn()
   judge: Judge;
 
-  @OneToOne(() => Criteria, (c) => c.id)
+  @ManyToOne(() => Criteria, (c) => c.id)
   @JoinColumn()
   criteria: Criteria;
 
