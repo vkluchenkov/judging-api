@@ -1,4 +1,3 @@
-import { Performance } from '../models/Performance.entity';
 import { User } from '../models/User.entity';
 import { WsClient } from '../websockets/types';
 

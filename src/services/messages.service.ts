@@ -9,7 +9,6 @@ import { SaveScoresServicePayload } from '../controllers/messages.types';
 import { handleWsError } from '../errors/handleWsError';
 import { ServerError } from '../errors/ServerError';
 import { NotFoundError } from '../errors/NotFoundError';
-import { JoinTable } from 'typeorm';
 
 export const getScoresByJudge = async (judgeId: number, performanceId: number) => {
   return await AppDataSource.getRepository(Performance)
@@ -58,7 +57,7 @@ export const saveScoresByJudge = async (payload: SaveScoresServicePayload) => {
           performance: { id: performanceId },
         });
 
-        const scoreRes = {
+        const scoreDBPayload = {
           value: score.score,
           judge: { id: judgeId },
           criteria: { id: score.criteriaId },
@@ -66,7 +65,7 @@ export const saveScoresByJudge = async (payload: SaveScoresServicePayload) => {
         };
 
         if (!isScore) {
-          return scoresRepository.save(scoreRes);
+          return scoresRepository.save(scoreDBPayload);
         } else return scoresRepository.update({ id: isScore.id }, { value: score.score });
       })
     );
@@ -109,7 +108,6 @@ export const confirmCategory = async (judgeId: number, categoryId: number) => {
   });
   if (!category) throw new NotFoundError(`No category found with id ${categoryId}`);
 
-  console.log(category);
   const isApproved = category.approvedBy.filter((judge) => judge.id === judgeId);
   if (!isApproved.length) {
     category.approvedBy.push(judge!);
