@@ -20,4 +20,7 @@ export class Judge {
   @OneToMany(() => Score, (score) => score.judge)
   @JoinTable()
   scores: Score[];
+
+  @ManyToMany(() => Category, (category) => category.judges)
+  categories: Category[];
 }

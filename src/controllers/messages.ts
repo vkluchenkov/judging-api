@@ -143,8 +143,8 @@ const confirmCategoryHandler = async (payload: ConfirmCategoryPayload) => {
 export const parser = async (payload: ParserPayload) => {
   const { user, message } = payload;
 
-  // Admin messages
-  if (user.role.name === 'admin') {
+  // Contest Admin messages
+  if (user.roles.find((role) => role.name === 'contestAdmin')) {
     // Push performance to all judges
     if (message.type === 'pushScores') {
       try {
@@ -159,7 +159,7 @@ export const parser = async (payload: ParserPayload) => {
   }
 
   // Judge messages
-  if (user.role.name === 'judge') {
+  if (user.roles.find((role) => role.name === 'judge')) {
     if (!user.judge)
       throw new ConflictError(
         `User ${user.username} assigned a role of a judge, but has not been assigned to a judge in the database`

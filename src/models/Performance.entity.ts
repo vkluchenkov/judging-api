@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -11,6 +12,7 @@ import {
 import { Category } from './Category.entity';
 import { Competition } from './Competition.entity';
 import { Contestant } from './Contestant.entity';
+import { Judge } from './Judge.entity';
 import { Note } from './Note.entity';
 import { Score } from './Score.entity';
 

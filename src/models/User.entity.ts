@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Judge } from './Judge.entity';
 import { Role } from './Role.entity';
 
@@ -17,6 +17,6 @@ export class User {
   @JoinColumn()
   judge: Judge;
 
-  @ManyToOne(() => Role, (role) => role.users)
-  role: Role;
+  @ManyToMany(() => Role, (role) => role.users)
+  roles: Role[];
 }

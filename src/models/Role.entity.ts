@@ -1,4 +1,13 @@
-import { Column, Entity, JoinTable, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Competition } from './Competition.entity';
 import { User } from './User.entity';
 
 @Entity({ name: 'roles' })
@@ -6,10 +15,14 @@ export class Role {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false, unique: true })
-  name: string;
+  @Column({ nullable: false })
+  name: 'judge' | 'contestAdmin' | 'gloablAdmin';
 
-  @OneToMany(() => User, (user) => user.role)
+  @OneToOne(() => Competition, { nullable: true })
+  @JoinColumn()
+  competition: Competition;
+
+  @ManyToMany(() => User, (user) => user.roles)
   @JoinTable()
   users: User[];
 }

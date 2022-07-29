@@ -6,6 +6,9 @@ import { parser } from '../controllers/messages';
 import { getUser } from '../controllers/user';
 import { WsClient } from './types';
 import { config } from 'dotenv';
+import { handleWsError } from '../errors/handleWsError';
+import { ServerError } from '../errors/ServerError';
+import { UnauthorizedError } from '../errors/UnauthorizedError';
 
 config();
 
@@ -66,12 +69,18 @@ export const WebSockets = (expressServer: httpServer) => {
         if (client) {
           try {
             const isValid = verify(token, secret);
-            if (isValid)
-              await parser({ client, user, message: JSON.parse(data.toString()), wsClients });
-          } catch (err) {
-            client.socket.send('Error: Your token is no longer valid. Please reauthenticate.'); //поправить логику месседжей с учетом ошибок парсера
+            if (!isValid)
+              throw new UnauthorizedError(
+                'Error: Your token is no longer valid. Please reauthenticate'
+              );
+          } catch (error) {
+            handleWsError({ err: error as ServerError });
             client.socket.close();
-            console.log('e3');
+          }
+          try {
+            await parser({ client, user, message: JSON.parse(data.toString()), wsClients });
+          } catch (error) {
+            handleWsError({ err: error as ServerError });
           }
         }
       });
