@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Category } from './Category.entity';
+import { Competition } from './Competition.entity';
 import { Contestant } from './Contestant.entity';
 import { Note } from './Note.entity';
 import { Score } from './Score.entity';
@@ -35,4 +36,7 @@ export class Performance {
   @OneToMany(() => Note, (note) => note.performance)
   @JoinTable()
   notes: Note[];
+
+  @ManyToOne(() => Competition)
+  competition: Competition;
 }

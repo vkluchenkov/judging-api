@@ -1,4 +1,13 @@
-import { Column, Entity, JoinColumn, JoinTable, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Competition } from './Competition.entity';
 import { Performance } from './Performance.entity';
 
 @Entity({ name: 'contestants' })
@@ -12,4 +21,7 @@ export class Contestant {
   @OneToMany(() => Performance, (p) => p.contestant)
   @JoinTable()
   performances: Performance[];
+
+  @ManyToMany(() => Competition, (competition) => competition.id)
+  competitions: Competition[];
 }

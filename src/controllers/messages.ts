@@ -32,7 +32,7 @@ const pushScoresHandler = async (payload: PushScoresPayload) => {
   const { client: admin, message, wsClients } = payload;
   const judgeSessions = wsClients.filter((wsClient) => wsClient.user.judge);
 
-  if (judgeSessions.length === 0) admin.socket.send('No connected judges found');
+  if (judgeSessions.length === 0) throw new NotFoundError('No active judges found');
 
   await Promise.all(
     judgeSessions.map(async (session) => {

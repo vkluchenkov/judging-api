@@ -8,6 +8,7 @@ import { Score } from './models/Score.entity';
 import { User } from './models/User.entity';
 import { Role } from './models/Role.entity';
 import { Note } from './models/Note.entity';
+import { Competition } from './models/Competition.entity';
 
 import { config } from 'dotenv';
 config();
@@ -21,7 +22,18 @@ export const AppDataSource = new DataSource({
   username: DB_USERNAME,
   password: DB_PASSWORD,
   database: DB_NAME,
-  entities: [Category, Contestant, Criteria, Judge, Performance, Score, User, Role, Note],
+  entities: [
+    Category,
+    Contestant,
+    Competition,
+    Criteria,
+    Judge,
+    Note,
+    Performance,
+    Role,
+    Score,
+    User,
+  ],
   synchronize: true,
   extra: {
     ssl: {
