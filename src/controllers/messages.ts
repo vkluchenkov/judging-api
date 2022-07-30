@@ -1,4 +1,3 @@
-import { NotFoundError } from '../errors/NotFoundError';
 import { handleWsError } from '../errors/handleWsError';
 import { ServerError } from '../errors/ServerError';
 import { ConflictError } from '../errors/ConflictError';
@@ -12,13 +11,6 @@ import {
   PushScoresPayload,
   SaveScoresPayload,
 } from './messages.types';
-import { categoryDto, notificationDto, judgeMessageDto, scoresDto } from './messages.dto';
-import {
-  getScoresByJudge,
-  getCategoryByJudge,
-  saveScoresByJudge,
-  confirmCategory,
-} from '../services/messages.service';
 import {
   getScoresDataSchema,
   getCategoryDataSchema,
@@ -27,121 +19,19 @@ import {
   pushScoresDataSchema,
 } from '../middlwares/validation';
 
-// Admin handlers
-const pushScoresHandler = async (payload: PushScoresPayload) => {
-  const { client: admin, message, wsClients } = payload;
-  const judgeSessions = wsClients.filter((wsClient) => wsClient.user.judge);
-
-  if (judgeSessions.length === 0) throw new NotFoundError('No active judges found');
-
-  await Promise.all(
-    judgeSessions.map(async (session) => {
-      const res = await getScoresByJudge(session.user.judge.id, message.performanceId);
-      if (!res)
-        throw new NotFoundError(
-          `No scores found for the judge ${session.user.judge.name} and the performance with id ${message.performanceId}`
-        );
-
-      const dto: scoresDto = {
-        view: 'scoring',
-        data: res,
-      };
-      session.socket.send(JSON.stringify(dto));
-      admin.socket.send(`Performance ${message.performanceId} sent to ${session.user.judge.name}`);
-    })
-  );
-};
-
-// Judge handlers
-const getScoresHandler = async (payload: GetScoresPayload) => {
-  const { user, message, client } = payload;
-  const res = await getScoresByJudge(user.judge.id, message.performanceId!);
-  if (!res)
-    throw new NotFoundError(
-      `No scores found for the judge ${user.judge.name} and the performance with id ${message.performanceId}`
-    );
-
-  const dto: scoresDto = {
-    view: 'scoring',
-    data: res,
-  };
-  client.socket.send(JSON.stringify(dto));
-};
-
-const getCategoryHandler = async (payload: GetCategoryPayload) => {
-  const { user, message, client } = payload;
-  const res = await getCategoryByJudge(user, message.categoryId);
-  if (!res.length)
-    throw new NotFoundError(
-      `No category found for the judge ${user.judge.name} and category with id ${message.categoryId}`
-    );
-
-  const dto: categoryDto = {
-    view: 'category',
-    data: res,
-  };
-  client.socket.send(JSON.stringify(dto));
-};
-
-const saveScoresHandler = async (payload: SaveScoresPayload) => {
-  const { user, message, client } = payload;
-  const { performanceId, scores, note } = message;
-  const { id: judgeId } = user.judge;
-
-  const performance = await getScoresByJudge(judgeId, performanceId);
-
-  if (performance && performance.category.isClosed)
-    throw new ConflictError(
-      `Not possible to save scores in closed category ${performance.category.name}`
-    );
-  else {
-    const res = await saveScoresByJudge({ scores, note, performanceId, judgeId });
-
-    //if category is finished (no dancer on stage), return category view
-    if (res && res.category.isFinished) {
-      const categoryData = await getCategoryByJudge(user, res.category.id);
-      const dto: categoryDto = {
-        view: 'category',
-        data: categoryData,
-      };
-      client.socket.send(JSON.stringify(dto));
-
-      //else return message to await for the next
-    } else {
-      const dto: judgeMessageDto = {
-        view: 'message',
-        data: { message: 'Thank you! Please wait for updates.' },
-      };
-      client.socket.send(JSON.stringify(dto));
-    }
-  }
-};
-
-const callHelpHandler = async (payload: CallHelpPayload) => {
-  const { client } = payload;
-  // Here goes nothing (message to admin logic)
-
-  const dto: notificationDto = {
-    view: 'notification',
-    data: { isSuccess: true },
-  };
-  client.socket.send(JSON.stringify(dto));
-};
-
-const confirmCategoryHandler = async (payload: ConfirmCategoryPayload) => {
-  const { client, user, message } = payload;
-  await confirmCategory(user.judge.id, message.categoryId);
-
-  const dto: notificationDto = {
-    view: 'notification',
-    data: { isSuccess: true },
-  };
-  client.socket.send(JSON.stringify(dto));
-};
+import {
+  pushScoresHandler,
+  getScoresHandler,
+  getCategoryHandler,
+  saveScoresHandler,
+  callHelpHandler,
+  confirmCategoryHandler,
+} from './messages.handlers';
 
 // Parser
 export const parser = async (payload: ParserPayload) => {
   const { user, message } = payload;
+  const { competitionId } = message;
 
   // Contest Admin messages
   if (user.roles.find((role) => role.name === 'contestAdmin')) {
@@ -159,10 +49,10 @@ export const parser = async (payload: ParserPayload) => {
   }
 
   // Judge messages
-  if (user.roles.find((role) => role.name === 'judge')) {
+  if (user.roles.find((role) => role.name === 'judge' && role.competition.id === competitionId)) {
     if (!user.judge)
       throw new ConflictError(
-        `User ${user.username} assigned a role of a judge, but has not been assigned to a judge in the database`
+        `User ${user.username} assigned a role of a judge, but has not been assigned to the judge in the database`
       );
 
     // Get single performance for re-scoring by individual judge
@@ -219,5 +109,8 @@ export const parser = async (payload: ParserPayload) => {
         handleWsError({ err: error as ServerError });
       }
     }
-  }
+  } else
+    throw new BadRequestError(
+      `User ${user.username} has no assigned roles for competition ${competitionId}`
+    );
 };

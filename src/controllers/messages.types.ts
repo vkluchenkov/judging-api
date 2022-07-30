@@ -67,6 +67,7 @@ export interface ConfirmCategoryPayload {
 interface GetScoresMessage {
   type: 'getScores';
   performanceId: number;
+  competitionId: number;
 }
 
 interface SaveScoresMessage {
@@ -74,31 +75,37 @@ interface SaveScoresMessage {
   scores: Score[];
   note: string;
   performanceId: number;
+  competitionId: number;
 }
 
 interface CallHelpMessage {
   type: 'callHelp';
+  competitionId: number;
 }
 
 interface GetCategoryMessage {
   type: 'getCategory';
   categoryId: number;
+  competitionId: number;
 }
 
 interface ConfirmCategoryMessage {
   type: 'confirmCategory';
   categoryId: number;
+  competitionId: number;
 }
 
 // Incoming messages from admin
 interface PushScoresMessage {
   type: 'pushScores';
   performanceId: number;
+  competitionId: number;
 }
 
 interface PushCategoryMessage {
   type: 'pushCategory';
   categoryId: number;
+  competitionId: number;
 }
 
 interface ChangeCategoryStatusMessage {
@@ -106,6 +113,7 @@ interface ChangeCategoryStatusMessage {
   categoryId: number;
   isFinished: boolean;
   isClosed: boolean;
+  competitionId: number;
 }
 
 // All incoming messages

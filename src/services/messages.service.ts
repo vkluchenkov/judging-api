@@ -9,12 +9,14 @@ import { SaveScoresServicePayload } from '../controllers/messages.types';
 import { handleWsError } from '../errors/handleWsError';
 import { ServerError } from '../errors/ServerError';
 import { NotFoundError } from '../errors/NotFoundError';
+import { ConflictError } from '../errors/ConflictError';
 
 export const getScoresByJudge = async (judgeId: number, performanceId: number) => {
   return await AppDataSource.getRepository(Performance)
     .createQueryBuilder('performance')
     .where('performance.id = :id', { id: performanceId })
     .leftJoinAndSelect('performance.category', 'category')
+    .leftJoinAndSelect('category.judges', 'judges')
     .leftJoinAndSelect('performance.contestant', 'contestant')
     .leftJoinAndSelect('performance.scores', 'scores')
     .leftJoinAndSelect('scores.judge', 'scoreJudge')
@@ -31,6 +33,7 @@ export const getCategoryByJudge = async (user: User, categoryId: number) => {
     .createQueryBuilder('performance')
     .leftJoinAndSelect('performance.category', 'category')
     .where('category.id = :id', { id: categoryId })
+    .leftJoinAndSelect('category.judges', 'judges')
     .leftJoinAndSelect('performance.contestant', 'contestant')
     .leftJoinAndSelect('performance.scores', 'scores')
     .leftJoinAndSelect('scores.judge', 'scoreJudge')
@@ -96,25 +99,31 @@ export const saveScoresByJudge = async (payload: SaveScoresServicePayload) => {
 };
 
 export const confirmCategory = async (judgeId: number, categoryId: number) => {
-  const categoryRepository = AppDataSource.getRepository(Category);
-  const judgeRepository = AppDataSource.getRepository(Judge);
+  try {
+    const categoryRepository = AppDataSource.getRepository(Category);
+    const judgeRepository = AppDataSource.getRepository(Judge);
 
-  const judge = await judgeRepository.findOneBy({ id: judgeId });
-  if (!judge) throw new NotFoundError(`No judge found with id ${judgeId}`);
+    const judge = await judgeRepository.findOneBy({ id: judgeId });
+    if (!judge) throw new NotFoundError(`No judge found with id ${judgeId}`);
 
-  const category = await categoryRepository.findOne({
-    where: { id: categoryId },
-    relations: { approvedBy: true },
-  });
-  if (!category) throw new NotFoundError(`No category found with id ${categoryId}`);
+    const category = await categoryRepository.findOne({
+      where: { id: categoryId },
+      relations: { approvedBy: true },
+    });
+    if (!category) throw new NotFoundError(`No category found with id ${categoryId}`);
 
-  const isApproved = category.approvedBy.filter((judge) => judge.id === judgeId);
-  if (!isApproved.length) {
-    category.approvedBy.push(judge!);
-    try {
-      await categoryRepository.save(category);
-    } catch (error) {
-      handleWsError({ err: error as ServerError });
-    }
+    const isCategoryJudge = category.judges.find((catJudge) => catJudge.id === judge.id);
+    if (!isCategoryJudge)
+      throw new ConflictError(
+        `Can't confirm category ${category.name} as the judge ${judge.name} is not assigned to it`
+      );
+
+    const isApproved = category.approvedBy.filter((judge) => judge.id === judgeId);
+    if (!isApproved.length) {
+      category.approvedBy.push(judge!);
+      return await categoryRepository.save(category);
+    } else return null;
+  } catch (error) {
+    handleWsError({ err: error as ServerError });
   }
 };

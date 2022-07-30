@@ -55,6 +55,7 @@ export const getUser = async (id: number) => {
     .createQueryBuilder('user')
     .where('user.id = :id', { id })
     .leftJoinAndSelect('user.judge', 'judge')
-    .leftJoinAndSelect('user.role', 'role')
+    .leftJoinAndSelect('user.roles', 'roles')
+    .leftJoinAndSelect('roles.competition', 'competition')
     .getOne();
 };
