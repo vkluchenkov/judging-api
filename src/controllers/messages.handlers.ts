@@ -15,7 +15,6 @@ import {
   saveScoresByJudge,
   confirmCategory,
 } from '../services/messages.service';
-import { Judge } from '../models/Judge.entity';
 
 // Admin handlers
 export const pushScoresHandler = async (payload: PushScoresPayload) => {
