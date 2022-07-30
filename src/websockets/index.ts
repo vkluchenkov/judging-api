@@ -9,6 +9,7 @@ import { config } from 'dotenv';
 import { handleWsError } from '../errors/handleWsError';
 import { ServerError } from '../errors/ServerError';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
+import { wsLogger } from '../middlwares/logger';
 
 config();
 
@@ -78,6 +79,13 @@ export const WebSockets = (expressServer: httpServer) => {
             client.socket.close();
           }
           try {
+            const logMessage = {
+              timestamp: new Date(),
+              user: user.id,
+              data: JSON.parse(data.toString()),
+            };
+            wsLogger.log('info', JSON.stringify(logMessage));
+
             await parser({ client, user, message: JSON.parse(data.toString()), wsClients });
           } catch (error) {
             handleWsError({ err: error as ServerError });

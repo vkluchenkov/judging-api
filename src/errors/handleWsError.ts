@@ -1,3 +1,4 @@
+import { wsErrorLogger } from '../middlwares/logger';
 import { HandleWsErrorArgs } from './types';
 
 export const handleWsError = (args: HandleWsErrorArgs) => {
@@ -7,5 +8,12 @@ export const handleWsError = (args: HandleWsErrorArgs) => {
   //   status: statusCode,
   //   message,
   // });
+  const logError = {
+    timestamp: new Date(),
+    statusCode,
+    message,
+  };
+  wsErrorLogger.log('error', JSON.stringify(logError));
+
   console.log(args.err);
 };

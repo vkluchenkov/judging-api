@@ -108,21 +108,23 @@ export const confirmCategory = async (judgeId: number, categoryId: number) => {
 
     const category = await categoryRepository.findOne({
       where: { id: categoryId },
-      relations: { approvedBy: true },
+      relations: { approvedBy: true, judges: true },
     });
+
     if (!category) throw new NotFoundError(`No category found with id ${categoryId}`);
 
     const isCategoryJudge = category.judges.find((catJudge) => catJudge.id === judge.id);
     if (!isCategoryJudge)
       throw new ConflictError(
-        `Can't confirm category ${category.name} as the judge ${judge.name} is not assigned to it`
+        `Can't confirm category ${category.id} as the judge ${judge.id} is not assigned to it`
       );
 
     const isApproved = category.approvedBy.filter((judge) => judge.id === judgeId);
     if (!isApproved.length) {
       category.approvedBy.push(judge!);
       return await categoryRepository.save(category);
-    } else return null;
+    } else
+      throw new ConflictError(`Category ${category.id} is already approved by judge ${judge.id}`);
   } catch (error) {
     handleWsError({ err: error as ServerError });
   }

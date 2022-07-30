@@ -55,7 +55,7 @@ export const parser = async (payload: ParserPayload) => {
         `User ${user.username} assigned a role of a judge, but has not been assigned to the judge in the database`
       );
 
-    // Get single performance for re-scoring by individual judge
+    // Get single performance for re-scoring by individual judge. Initial scoring can be sent by admin only.
     if (message.type === 'getScores') {
       try {
         const validation = getScoresDataSchema.validate(message);
