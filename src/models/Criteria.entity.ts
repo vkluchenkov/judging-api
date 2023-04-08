@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Score } from './Score.entity';
 
 @Entity({ name: 'criterias' })
 export class Criteria {
@@ -7,4 +8,11 @@ export class Criteria {
 
   @Column({ nullable: false })
   name: string;
+
+  @Column({ nullable: false })
+  description: string;
+
+  @OneToMany(() => Score, (score) => score.criteria)
+  @JoinTable()
+  scores: Score[];
 }

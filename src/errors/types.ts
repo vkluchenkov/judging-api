@@ -1,4 +1,4 @@
-import { Response, Request, NextFunction, ErrorRequestHandler } from 'express';
+import { Response, Request, NextFunction } from 'express';
 import { ServerError } from './ServerError';
 
 export interface HandleErrorArgs {
@@ -6,4 +6,8 @@ export interface HandleErrorArgs {
   req: Request;
   res: Response;
   next: NextFunction;
+}
+
+export interface HandleWsErrorArgs {
+  err: ServerError;
 }

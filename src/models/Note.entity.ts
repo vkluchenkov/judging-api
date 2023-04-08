@@ -1,23 +1,18 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Criteria } from './Criteria.entity';
 import { Judge } from './Judge.entity';
 import { Performance } from './Performance.entity';
 
-@Entity({ name: 'scores' })
-export class Score {
+@Entity({ name: 'notes' })
+export class Note {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
-  value: number;
+  @Column()
+  text: string;
 
-  @ManyToOne(() => Judge, (j) => j.id)
+  @OneToOne(() => Judge, (j) => j.id)
   @JoinColumn()
   judge: Judge;
-
-  @ManyToOne(() => Criteria, (c) => c.id)
-  @JoinColumn()
-  criteria: Criteria;
 
   @ManyToOne(() => Performance, (p) => p.scores)
   performance: Performance;

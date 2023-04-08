@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { config } from 'dotenv';
 import { sign } from 'jsonwebtoken';
 import { compare, hash } from 'bcryptjs';
-import { LoginPayload } from './types';
+import { LoginPayload } from './user.types';
 import { User } from '../models/User.entity';
 import { AppDataSource } from '../data-source';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
@@ -28,6 +28,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       }
     }
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
@@ -47,4 +48,14 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
   } catch (err) {
     next(err);
   }
+};
+
+export const getUser = async (id: number) => {
+  return await AppDataSource.getRepository(User)
+    .createQueryBuilder('user')
+    .where('user.id = :id', { id })
+    .leftJoinAndSelect('user.judge', 'judge')
+    .leftJoinAndSelect('user.roles', 'roles')
+    .leftJoinAndSelect('roles.competition', 'competition')
+    .getOne();
 };
