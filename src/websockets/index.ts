@@ -19,7 +19,7 @@ export const WebSockets = (expressServer: httpServer) => {
 
   wss.on('connection', async (ws, req) => {
     if (!req.url) {
-      ws.send('Error: Incorrect or missing token');
+      ws.send('Error: Missing token');
       ws.close();
       return;
     }
@@ -78,6 +78,7 @@ export const WebSockets = (expressServer: httpServer) => {
             handleWsError({ err: error as ServerError });
             client.socket.close();
           }
+          
           try {
             const logMessage = {
               timestamp: new Date(),

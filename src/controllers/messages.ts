@@ -34,7 +34,7 @@ export const parser = async (payload: ParserPayload) => {
   const { competitionId } = message;
 
   // Contest Admin messages
-  if (user.roles.find((role) => role.name === 'contestAdmin')) {
+  if (user.roles.find((role) => role.name === 'contestAdmin' || role.name === 'globalAdmin')) {
     // Push performance to all judges
     if (message.type === 'pushScores') {
       try {
@@ -49,13 +49,19 @@ export const parser = async (payload: ParserPayload) => {
   }
 
   // Judge messages
-  if (user.roles.find((role) => role.name === 'judge' && role.competition.id === competitionId)) {
+  if (
+    user.roles.find(
+      (role) =>
+        (role.name === 'judge' || role.name === 'globalAdmin') &&
+        role.competition.id === competitionId
+    )
+  ) {
     if (!user.judge)
       throw new ConflictError(
         `User ${user.username} assigned a role of a judge, but has not been assigned to the judge in the database`
       );
 
-    // Get single performance for re-scoring by individual judge. Initial scoring can be sent by admin only.
+    // Get single performance for re-scoring by individual judge. Initial performance scoring can be pushed to judge by admin only.
     if (message.type === 'getScores') {
       try {
         const validation = getScoresDataSchema.validate(message);

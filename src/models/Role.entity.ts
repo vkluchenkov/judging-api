@@ -16,7 +16,7 @@ export class Role {
   id: number;
 
   @Column({ nullable: false })
-  name: 'judge' | 'contestAdmin' | 'gloablAdmin';
+  name: 'judge' | 'contestAdmin' | 'globalAdmin';
 
   @OneToOne(() => Competition, { nullable: true })
   @JoinColumn()
